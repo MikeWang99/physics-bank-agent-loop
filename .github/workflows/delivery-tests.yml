@@ -3,6 +3,7 @@ name: Post-acceptance delivery regression
 on:
   push:
     branches:
+      - main
       - feat/post-acceptance-delivery-v1
   pull_request:
     paths:

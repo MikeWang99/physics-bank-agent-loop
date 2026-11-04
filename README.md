@@ -27,3 +27,10 @@ After installation, invoke `$physics-bank-agent-loop` for a bank task that requi
 ## Updating the bundled Physics Bank skill
 
 The bundled skill is a versioned snapshot. When updating it, copy the complete skill directory, update the version noted above, and review the change against the upstream `physics-bank` repository before release.
+
+
+## Post-acceptance delivery extension
+
+The original high-quality source extraction/asset review and independent Creator/Reviewer loop remain unchanged. The optional new delivery phase can generate standardized reviewed student answers, compile per question, quarantine incompatible items without blocking valid questions, and pass the ready subset to the **already existing** Pocket Cosmos production publisher API. See \`skills/physics-bank-agent-loop/references/post-acceptance-delivery.md\` and \`skills/physics-bank-agent-loop/scripts/delivery.py\`.
+
+This first-stage change is **not** a direct PDF/DOCX/image upload web endpoint or a completed online high-priority review queue. Those website-facing endpoints, plus v2/TIMBAD cloud editing, remain follow-on integration work. Publish defaults to preflight; only \`--apply\` makes production writes.

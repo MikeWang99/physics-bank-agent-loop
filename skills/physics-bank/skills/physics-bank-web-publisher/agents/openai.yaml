@@ -1,0 +1,7 @@
+interface:
+  display_name: "题库网页发布"
+  short_description: "带版本、图文与答案来源审计的题库发布"
+  default_prompt: "Use $physics-bank-web-publisher v1.2. Validate physics-bank v2.7 answers, math, assets, layouts and semantic classification first. Key-only answers provide only correctAnswer; never invent explanations. Preserve source-derived worked explanations and answer figures with role=answer. Block unsupported interleaved layouts by default. Use the authenticated production API for a dry-run plan and direct asset upload; use --apply only after the user asked to publish. Never simulate clicks in the human upload page or send a Supabase service-role key from the AI environment."
+
+policy:
+  allow_implicit_invocation: true

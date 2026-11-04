@@ -1,0 +1,7 @@
+interface:
+  display_name: "物理题库"
+  short_description: "忠实提取题干、答案、图片与可审计语义分类"
+  default_prompt: "Use $physics-bank v3.0 candidate end-to-end. Read the complete Pocket Cosmos TIMBAD rubric before rating: use L1–L7 and independent six-axis 0–2 scores, preserve L0 rejection/null review states, and keep independent rating solutions separate from source answers. Extract real answer-key labels without generating extra solution prose or AAPT attribution; store source citations separately under answer.source. For image-based solutions preserve the unedited source, faithfully transcribe equations/derivations, isolate instructional answer figures, log excluded signatures/watermarks with source bboxes, retain exact answer.layout_blocks and seal final assets. Render and inspect a worked-answer visual review sheet; bind answer.visual_review to original-source SHA, page and bbox, reject omitted signatures that overlap diagrams, and never claim visual review without inspection. Strictly validate answers, math, visual assets, year and semantic classification before publishing."
+
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,26 @@
+{
+  "schema": "physics-bank-curriculum-taxonomy/v1",
+  "course": {
+    "id": "replace-course-id",
+    "name": "Replace Course Name",
+    "basis": "official-syllabus|competition-bank-taxonomy|user-taxonomy|generic-physics-taxonomy"
+  },
+  "units": [
+    {
+      "id": "replace-unit-id",
+      "name": "Replace Unit Name",
+      "topics": [
+        {
+          "id": "replace-topic-id",
+          "name": "Replace Topic Name",
+          "subtopics": [
+            {
+              "id": "replace-subtopic-id",
+              "name": "Replace Subtopic Name"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

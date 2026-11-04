@@ -1,0 +1,4 @@
+interface:
+  display_name: "Physics Bank Agent Loop"
+  short_description: "Build and independently review question banks"
+  default_prompt: "Use $physics-bank-agent-loop to build and review this question bank."

@@ -1,0 +1,193 @@
+{
+  "schema": "physics-bank-semantic-reference/v1",
+  "domains": [
+    {
+      "id": "mechanics",
+      "name": "Mechanics"
+    },
+    {
+      "id": "electricity-magnetism",
+      "name": "Electricity & Magnetism"
+    },
+    {
+      "id": "waves-oscillations",
+      "name": "Waves & Oscillations"
+    },
+    {
+      "id": "thermodynamics",
+      "name": "Thermodynamics"
+    },
+    {
+      "id": "fluids",
+      "name": "Fluids"
+    },
+    {
+      "id": "optics",
+      "name": "Optics"
+    },
+    {
+      "id": "modern-physics",
+      "name": "Modern Physics"
+    },
+    {
+      "id": "experimental-methods",
+      "name": "Experimental Methods"
+    },
+    {
+      "id": "mathematical-methods",
+      "name": "Mathematical Methods"
+    },
+    {
+      "id": "cross-domain",
+      "name": "Cross-domain"
+    }
+  ],
+  "solution_model_kinds": [
+    "governing_law",
+    "definition",
+    "constraint",
+    "conservation_law",
+    "constitutive_relation",
+    "kinematic_relation",
+    "geometry",
+    "boundary_condition",
+    "initial_condition",
+    "symmetry",
+    "approximation",
+    "representation",
+    "mathematical_identity"
+  ],
+  "skills": [
+    {
+      "id": "model_selection",
+      "name": "Model selection"
+    },
+    {
+      "id": "free_body_diagram",
+      "name": "Free-body diagram"
+    },
+    {
+      "id": "representation_choice",
+      "name": "Representation choice"
+    },
+    {
+      "id": "graph_interpretation",
+      "name": "Graph interpretation"
+    },
+    {
+      "id": "graph_construction",
+      "name": "Graph construction"
+    },
+    {
+      "id": "equation_setup",
+      "name": "Equation setup"
+    },
+    {
+      "id": "multi_step_reasoning",
+      "name": "Multi-step reasoning"
+    },
+    {
+      "id": "proportional_reasoning",
+      "name": "Proportional reasoning"
+    },
+    {
+      "id": "vector_decomposition",
+      "name": "Vector decomposition"
+    },
+    {
+      "id": "coordinate_choice",
+      "name": "Coordinate-system choice"
+    },
+    {
+      "id": "conservation_law_selection",
+      "name": "Conservation-law selection"
+    },
+    {
+      "id": "constraint_recognition",
+      "name": "Constraint recognition"
+    },
+    {
+      "id": "estimation",
+      "name": "Estimation"
+    },
+    {
+      "id": "unit_analysis",
+      "name": "Unit/dimensional analysis"
+    },
+    {
+      "id": "limiting_case",
+      "name": "Limiting-case reasoning"
+    },
+    {
+      "id": "symmetry_reasoning",
+      "name": "Symmetry reasoning"
+    },
+    {
+      "id": "data_analysis",
+      "name": "Data analysis"
+    },
+    {
+      "id": "experimental_design",
+      "name": "Experimental design"
+    },
+    {
+      "id": "uncertainty_analysis",
+      "name": "Uncertainty analysis"
+    },
+    {
+      "id": "algebraic_manipulation",
+      "name": "Algebraic manipulation"
+    },
+    {
+      "id": "calculus",
+      "name": "Calculus"
+    },
+    {
+      "id": "geometry",
+      "name": "Geometry"
+    },
+    {
+      "id": "qualitative_explanation",
+      "name": "Qualitative explanation"
+    },
+    {
+      "id": "comparison_reasoning",
+      "name": "Comparison reasoning"
+    }
+  ],
+  "difficulty_rubric": {
+    "L0": "Rejected quality state only; excluded from usable difficulty tiers",
+    "L1": "Fundamental: direct recall, recognition or a single concept",
+    "L2": "Direct Application: familiar law applied directly with minimal strategy selection",
+    "L3": "Standard Problem Solving: independently organize familiar linked steps",
+    "L4": "Advanced Problem Solving: complex combinations of standard models or states without a substantive nonroutine insight",
+    "L5": "Introductory Competition: a substantive non-obvious breakthrough, then a mostly standard finish",
+    "L6": "Advanced Competition: deep nonstandard reasoning remains after a local initial hint",
+    "L7": "Elite Olympiad: highly creative modeling, insight or rigorous argument beyond standard competition methods"
+  },
+  "confidence": {
+    "review_below": 0.75,
+    "description": "Overall classification confidence from 0 to 1; low confidence requires manual semantic review"
+  },
+  "difficulty_contract": {
+    "rubric_id": "pocket-cosmos-timbad",
+    "rubric_version": "1.0",
+    "full_reference": "timbad-difficulty-rubric.md",
+    "integration_reference": "difficulty-assessment.md",
+    "dimensions": {
+      "T": "TARGET",
+      "I": "INFORMATION",
+      "M": "MODEL",
+      "B": "BRIDGE",
+      "A": "ANALYZE",
+      "D": "DOUBLE CHECK"
+    },
+    "dimension_scores": [
+      0,
+      1,
+      2
+    ],
+    "overall_level_is_sum": false,
+    "legacy_levels_require_reassessment": true
+  }
+}

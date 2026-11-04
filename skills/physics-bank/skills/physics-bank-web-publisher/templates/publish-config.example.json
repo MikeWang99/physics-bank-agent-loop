@@ -1,0 +1,28 @@
+{
+  "schema": "pocket-cosmos-publish-config/v1",
+  "practice_set": {
+    "id": "replace-practice-set-id",
+    "system": "competition",
+    "category": "mechanics",
+    "practice_kind": "mcq",
+    "chapter": 1,
+    "chapter_title": "Mechanics",
+    "label": "Replace label",
+    "title": "Replace practice set title",
+    "eyebrow": "Replace eyebrow",
+    "description": "Replace description",
+    "sources": []
+  },
+  "rendering": {
+    "allow_layout_degradation": false,
+    "choice_layout": "stacked",
+    "allow_answer_layout_degradation": false
+  },
+  "storage": {
+    "bucket": "question-assets",
+    "prefix": "banks/production/assets"
+  },
+  "answers": {
+    "missing_mcq_nudge": "Select an option to record your response. The source bank does not include an answer key yet."
+  }
+}

@@ -68,6 +68,12 @@ class AnswerContractTests(unittest.TestCase):
         self.assertEqual(answer["origin"], "ai_generated")
         self.assertIsNone(answer["label"])
 
+    def test_topic_gate_rejects_missing_mapping_even_if_course_practice_publishes(self):
+        item = {"version": {"metadata": {"physicsBank": {"classification": {"schema": "physics-question-classification/v1"}}, "practiceStep": {}}}}
+        eligible, reason = delivery.topic_display_eligibility(item)
+        self.assertFalse(eligible)
+        self.assertIn("Topic Practice", reason)
+
     def test_hash_recomputes_after_answer_change(self):
         item = {
             "version": {"stem": "hello", "choices": [], "answer": {"solution": "old"},
@@ -115,9 +121,10 @@ class MixedBatchTests(unittest.TestCase):
             report = delivery.run(bank, config, answers, base / "output", False)
             self.assertEqual(report["sourceQuestionCount"], 2)
             self.assertEqual(report["readyCount"], 1)
-            self.assertEqual(report["highPriorityCount"], 1)
+            self.assertEqual(report["highPriorityCount"], 2)
             self.assertFalse(report["published"])
-            self.assertEqual(report["highPriorityReview"][0]["questionId"], "q002")
+            self.assertEqual({row["questionId"] for row in report["highPriorityReview"]}, {"q001", "q002"})
+            self.assertEqual({row["status"] for row in report["highPriorityReview"]}, {"published_course_only", "not_published"})
             ready = delivery.load(base / "output/web-publish-ready.json")
             self.assertEqual(len(ready["questions"]), 1)
             compiled = ready["questions"][0]

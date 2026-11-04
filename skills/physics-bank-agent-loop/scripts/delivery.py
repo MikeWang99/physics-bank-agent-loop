@@ -186,6 +186,43 @@ def isolated_compile(bank: Path, config: dict, question: dict, position: int, as
         return item
 
 
+
+def sync_unpublished_issues(report: dict, practice_set_id: str) -> dict:
+    """Persist high-priority failures without affecting successfully published questions.
+
+    The authenticated endpoint requires the separate additive website migration.
+    A failed queue sync is explicitly reported, not mistaken for publication rollback.
+    """
+    issues = report.get("highPriorityReview") or []
+    if not issues:
+        return {"status": "none", "stored": 0}
+    import os
+    module_file = SCRIPT_DIR / "publish_via_api.py"
+    spec = importlib.util.spec_from_file_location("physics_bank_delivery_api", module_file)
+    publisher = importlib.util.module_from_spec(spec)
+    assert spec and spec.loader
+    spec.loader.exec_module(publisher)
+    token = publisher.read_token()
+    api_url = os.environ.get("POCKET_COSMOS_PUBLISH_API", publisher.DEFAULT_API).rstrip("/")
+    if not token:
+        raise ValueError("Publisher token not configured for high-priority issue intake")
+    if not api_url.endswith("/imports"):
+        raise ValueError("POCKET_COSMOS_PUBLISH_API must end in /imports to derive /issues")
+    endpoint = api_url[: -len("/imports")] + "/issues"
+    count = 0
+    for offset in range(0, len(issues), 200):
+        subset = issues[offset:offset + 200]
+        result = publisher.api_call(endpoint, token, {
+            "practiceSetId": practice_set_id,
+            "issues": [
+                {"questionId": issue["questionId"], "position": issue["position"], "reason": issue["reason"]}
+                for issue in subset
+            ],
+        })
+        count += int(result.get("stored", 0))
+    return {"status": "stored", "stored": count}
+
+
 def run(bank: Path, config_file: Path, answers_file: Path, output_dir: Path, apply: bool) -> dict:
     bank, output_dir = bank.resolve(), output_dir.resolve()
     questions = load(bank / "questions.json").get("questions")
@@ -297,6 +334,14 @@ def run(bank: Path, config_file: Path, answers_file: Path, output_dir: Path, app
             raise RuntimeError("Publish API rejected ready questions:\n" + result.stdout + result.stderr)
         report["published"] = True
         report["publisherOutput"] = result.stdout.strip()
+        dump(output_dir / "delivery-review-queue.json", report)
+    if apply and priority:
+        try:
+            report["issueSync"] = sync_unpublished_issues(report, str(ps.get("id") or ""))
+        except (ValueError, RuntimeError, KeyError, OSError) as exc:
+            report["issueSync"] = {"status": "failed", "error": str(exc)}
+            # A high-priority intake failure cannot undo successful question publishing.
+            # The local JSON remains the recoverable source of pending failures.
         dump(output_dir / "delivery-review-queue.json", report)
     return report
 

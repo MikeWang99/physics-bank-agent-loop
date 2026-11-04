@@ -125,6 +125,7 @@ def reviewed_answer(source: dict, question: dict) -> dict:
         "label": None,
         "text": "**Exam-style answer**\n\n" + exam + "\n\n**Detailed explanation**\n\n" + explanation,
         "examAnswer": exam,
+        "detailedExplanation": "**Detailed explanation**\\n\\n" + explanation,
         "creatorId": creator_id,
         "reviewerId": reviewer_id,
         "reviewNotes": reviewer["notes"].strip(),
@@ -229,14 +230,18 @@ def run(bank: Path, config_file: Path, answers_file: Path, output_dir: Path, app
             meta = version["metadata"]
             step = meta["practiceStep"]
             preserved = version["answer"]
-            preserved["solution"] = answer["text"]
+            # MCQ shows one labeled answer+explanation; FRQ uses two distinct
+            # existing Practice disclosures, avoiding a duplicated exam answer.
+            student_solution = answer.get("detailedExplanation") or answer["text"]
+            preserved["solution"] = student_solution
             if answer["label"]:
                 preserved["correctAnswer"] = answer["label"]
                 step["correctAnswer"] = answer["label"]
                 step["maxScore"] = 1
             if answer["examAnswer"]:
                 preserved["sampleAnswer"] = answer["examAnswer"]
-            step["solution"] = answer["text"]
+                step["sampleAnswer"] = answer["examAnswer"]
+            step["solution"] = student_solution
             meta["physicsBank"]["deliveryAnswer"] = {
                 "schema": ANSWERS_SCHEMA,
                 "origin": answer["origin"],

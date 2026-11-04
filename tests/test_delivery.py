@@ -56,6 +56,9 @@ class AnswerContractTests(unittest.TestCase):
             delivery.markdown_latex("$F=ma", "value")
         with self.assertRaisesRegex(ValueError, "backslash math delimiters"):
             delivery.markdown_latex(r"\(F=ma\)", "value")
+        with self.assertRaisesRegex(ValueError, "mismatched"):
+            delivery.markdown_latex("$F=ma$", "value")
+        self.assertEqual(delivery.markdown_latex("$F=ma$", "value"), "$F=ma$")
 
     def test_frq_sections_are_separate(self):
         q = {"id": "q002", "stem": "Find the acceleration.", "answer": {}}

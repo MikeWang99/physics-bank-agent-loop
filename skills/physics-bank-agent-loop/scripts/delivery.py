@@ -125,7 +125,7 @@ def reviewed_answer(source: dict, question: dict) -> dict:
         "label": None,
         "text": "**Exam-style answer**\n\n" + exam + "\n\n**Detailed explanation**\n\n" + explanation,
         "examAnswer": exam,
-        "detailedExplanation": "**Detailed explanation**\\n\\n" + explanation,
+        "detailedExplanation": "**Detailed explanation**\n\n" + explanation,
         "creatorId": creator_id,
         "reviewerId": reviewer_id,
         "reviewNotes": reviewer["notes"].strip(),

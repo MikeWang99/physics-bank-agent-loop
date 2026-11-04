@@ -293,7 +293,9 @@ def source_acceptance(bank: Path, questions: list, report_file: Path | None) -> 
 
 
 def run(bank: Path, config_file: Path, answers_file: Path, output_dir: Path, apply: bool,
-        acceptance_report_file: Path | None = None) -> dict:
+        acceptance_report_file: Path | None = None, full_source_accepted: bool = False) -> dict:
+    if apply and not (full_source_accepted or acceptance_report_file):
+        raise ValueError("Production publication requires explicit full source ACCEPT or a SHA-bound per-question acceptance report")
     bank, output_dir = bank.resolve(), output_dir.resolve()
     questions = load(bank / "questions.json").get("questions")
     assets = load(bank / "assets.json").get("assets")
@@ -432,9 +434,10 @@ def main() -> int:
     parser.add_argument("--output-dir", required=True, type=Path)
     parser.add_argument("--apply", action="store_true", help="publish ready questions through the existing production API")
     parser.add_argument("--acceptance-report", type=Path, help="optional per-question independent source acceptance report for partial batches")
+    parser.add_argument("--source-accepted", action="store_true", help="explicitly attest original full-bank Reviewer ACCEPT before production apply")
     args = parser.parse_args()
     report = run(args.bank, args.publish_config, args.reviewed_answers, args.output_dir, args.apply,
-                 args.acceptance_report)
+                 args.acceptance_report, args.source_accepted)
     print(json.dumps({k: report[k] for k in ("sourceQuestionCount", "readyCount", "highPriorityCount", "published")}))
     return 0
 

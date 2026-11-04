@@ -215,7 +215,8 @@ def sync_unpublished_issues(report: dict, practice_set_id: str) -> dict:
         result = publisher.api_call(endpoint, token, {
             "practiceSetId": practice_set_id,
             "issues": [
-                {"questionId": issue["questionId"], "position": issue["position"], "reason": issue["reason"]}
+                {"questionId": issue["questionId"], "position": issue["position"], "reason": issue["reason"],
+                 "status": issue["status"]}
                 for issue in subset
             ],
         })

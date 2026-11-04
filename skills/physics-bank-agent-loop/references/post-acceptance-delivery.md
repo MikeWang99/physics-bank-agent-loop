@@ -71,3 +71,22 @@ The cloud review editor currently blocks v2/TIMBAD edits. Website repair require
 ## P2 (design only, not implemented)
 
 Two separate **submission adapters**, one from Codex and one from the owner-only web admin UI, should upload PDF, DOCX, PNG/JPEG/WebP, scans or mixed inputs to private object storage and enqueue the *same* Coordinator job. The job selects an input parser but shares the exact current PhysicsBank Creator and independent Reviewer. A server-side worker, not the Vercel request handler and not a browser-held token, controls model execution, retries, quotas and progress. Track job ID, per-question ID/status, user scope, source hashes and idempotency keys. Enforce authorization, MIME/content validation, malware/size limits and private storage. Preserve source copyrights and rights to publish. This second stage does not exist in v1.
+
+
+## Partial source acceptance when a whole batch fails
+
+The original Reviewer remains strictly read-only and its whole-bank \`ACCEPT\` gate **is not relaxed**. When a batch cannot be accepted after five repair rounds, the Coordinator may ask the same independent Reviewer to separately audit each unaffected question as an isolated source unit against its original pages, relevant asset seals and strict original PhysicsBank validators. Only independently ACCEPTed units can be published. The Coordinator records every unit's source evidence and a SHA-256 of the original *unchanged* \`questions.json\`, e.g.:
+
+\`\`\`json
+{
+  "schema": "physics-bank-source-acceptance/v1",
+  "sourceQuestionsSha256": "<sha256 of original questions.json bytes>",
+  "reviewerId": "independent-source-reviewer",
+  "reviews": [
+    {"questionId": "q001", "disposition": "ACCEPT", "evidence": "Compared source P2 Q1, diagram seals and strict unit validators."},
+    {"questionId": "q002", "disposition": "REVISE", "evidence": "Source diagram unclear on P3 Q2."}
+  ]
+}
+\`\`\`
+
+Supply the optional \`--acceptance-report /path/to/acceptance.json\` to \`delivery.py\`. It rejects changed source-bank SHA, missing evidence, unknown IDs or missing dispositions. Unaccepted questions are added to the high-priority unpublished queue while individually accepted questions continue toward compilation. Without a per-question report, call the adapter only on a whole bank that the original Reviewer has already accepted. Merely splitting a failing bank **must not** turn a failed question into an accepted one. This partial-review protocol does not grant permission to skip source-fidelity checks.

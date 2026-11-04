@@ -71,7 +71,16 @@ def markdown_latex(value: object, field: str) -> str:
     result = value.strip()
     if any(token in result for token in (r"\(", r"\)", r"\[", r"\]")):
         raise ValueError(f"{field}: use $...$ or $$...$$, not backslash math delimiters")
-    if len(re.findall(r"(?<!\\)\$", result)) % 2:
+    opened = None
+    for match in re.finditer(r"(?<!\\)\$\$|(?<!\\)\$", result):
+        delimiter = match.group()
+        if opened is None:
+            opened = delimiter
+        elif opened == delimiter:
+            opened = None
+        else:
+            raise ValueError(f"{field}: mismatched inline/display LaTeX delimiters")
+    if opened is not None:
         raise ValueError(f"{field}: unbalanced LaTeX dollar delimiters")
     if re.search(r"<[a-zA-Z][^>]*>", result):
         raise ValueError(f"{field}: HTML is not permitted")

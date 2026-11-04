@@ -58,7 +58,7 @@ python3 skills/physics-bank-agent-loop/scripts/delivery.py \
   --output-dir /path/to/question-bank/delivery
 \`\`\`
 
-This default is a **local preflight only**; it does not contact production. Inspect \`delivery-review-queue.json\` and the validated ready bundle. With an explicitly authorized publication task and configured publisher token, append \`--apply\` to invoke the existing \`publish_via_api.py\`. Never put \`PHYSICS_BANK_PUBLISH_TOKEN\` or Supabase service keys into generated bundles or GitHub.
+This default is a **local preflight only**; it does not contact production. Inspect \`delivery-review-queue.json\` and the validated ready bundle. With an explicitly authorized publication task and configured publisher token, append \`--source-accepted --apply\` after the original full-bank Reviewer returns ACCEPT to invoke the existing \`publish_via_api.py\`. Never put \`PHYSICS_BANK_PUBLISH_TOKEN\` or Supabase service keys into generated bundles or GitHub.
 
 ### Important website integration limitations
 
@@ -89,4 +89,4 @@ The original Reviewer remains strictly read-only and its whole-bank \`ACCEPT\` g
 }
 \`\`\`
 
-Supply the optional \`--acceptance-report /path/to/acceptance.json\` to \`delivery.py\`. It rejects changed source-bank SHA, missing evidence, unknown IDs or missing dispositions. Unaccepted questions are added to the high-priority unpublished queue while individually accepted questions continue toward compilation. Without a per-question report, call the adapter only on a whole bank that the original Reviewer has already accepted. Merely splitting a failing bank **must not** turn a failed question into an accepted one. This partial-review protocol does not grant permission to skip source-fidelity checks.
+Supply the optional \`--acceptance-report /path/to/acceptance.json\` to \`delivery.py\`. This report also satisfies the source acceptance gate for \`--apply\`; a fully accepted original bank instead requires \`--source-accepted --apply\`. It rejects changed source-bank SHA, missing evidence, unknown IDs or missing dispositions. Unaccepted questions are added to the high-priority unpublished queue while individually accepted questions continue toward compilation. Without a per-question report, call the adapter only on a whole bank that the original Reviewer has already accepted. Merely splitting a failing bank **must not** turn a failed question into an accepted one. This partial-review protocol does not grant permission to skip source-fidelity checks.

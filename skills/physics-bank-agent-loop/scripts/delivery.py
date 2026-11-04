@@ -223,6 +223,30 @@ def sync_unpublished_issues(report: dict, practice_set_id: str) -> dict:
     return {"status": "stored", "stored": count}
 
 
+def topic_display_eligibility(item: dict) -> tuple[bool, str]:
+    """Mirror critical Pocket Cosmos v2 topic-index metadata gates locally."""
+    meta = item.get("version", {}).get("metadata") or {}
+    pb = meta.get("physicsBank") or {}
+    step = meta.get("practiceStep") or {}
+    c = pb.get("classification") or {}
+    if c.get("schema") != "physics-question-classification/v2":
+        return False, "Course Practice can show this bank, but unified Topic Practice requires reviewed v2 UID classification"
+    uid = c.get("primary_knowledge_uid")
+    digest = (c.get("taxonomy") or {}).get("sha256")
+    difficulty = c.get("difficulty") or {}
+    if not uid or uid != pb.get("primaryKnowledgeUid") or uid != step.get("primaryKnowledgeUid"):
+        return False, "Knowledge UID is missing or inconsistent between classification and Practice"
+    if not digest or digest != (pb.get("knowledgeTaxonomy") or {}).get("sha256"):
+        return False, "Knowledge tree hashes disagree"
+    if c.get("status") != "reviewed" or (c.get("review") or {}).get("reviewed") is not True:
+        return False, "Independent classification review is not complete"
+    if difficulty.get("review_status") != "APPROVED" or difficulty.get("level") not in range(1, 8):
+        return False, "Topic Practice requires a reviewed compatible TIMBAD difficulty"
+    if pb.get("sourceSystem") != step.get("sourceSystem") or pb.get("sourceSystem") != meta.get("practiceSet", {}).get("system"):
+        return False, "Course / source system mapping differs"
+    return True, "Unified topic UID and course metadata are compatible"
+
+
 def source_acceptance(bank: Path, questions: list, report_file: Path | None) -> dict[str, str]:
     """Optional partial acceptance evidence from the unchanged source Reviewer.
 
@@ -330,7 +354,12 @@ def run(bank: Path, config_file: Path, answers_file: Path, output_dir: Path, app
             }
             recalculate_hash(item)
             ready.append(item)
-            normal.append({"questionId": qid, "reason": "published_pending_human_review", "priority": "normal"})
+            topic_ok, topic_reason = topic_display_eligibility(item)
+            if topic_ok:
+                normal.append({"questionId": qid, "reason": "published_pending_human_review", "priority": "normal"})
+            else:
+                priority.append({"questionId": qid, "position": pos, "priority": "high",
+                                 "status": "published_course_only", "reason": topic_reason})
         except (ValueError, KeyError, TypeError, OSError) as exc:
             priority.append({"questionId": qid, "position": pos, "priority": "high",
                              "status": "not_published", "reason": str(exc)})

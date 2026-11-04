@@ -44,3 +44,12 @@ The Reviewer never edits bank files. The Creator never approves its own work. Th
 ## Included skill dependency
 
 The Creator calls `$physics-bank`. Its extraction, answer handling, visual asset review, taxonomy, difficulty, schema, and validation rules live in `skills/physics-bank/`. That directory is included rather than relying on a separate local installation, so this repository contains the exact skill dependency needed by the architecture. The nested publisher skill is included as part of that complete snapshot; publishing is not part of the Creator/Reviewer acceptance decision.
+
+
+## Extension: post-acceptance delivery (opt-in)
+
+The original Coordinator → Creator → independent read-only Reviewer source loop is **frozen**. This extension runs only *after* that loop reaches acceptance. It adds an Answer Writer and separately tasked independent Answer Verifier for canonical, student-facing MCQ/FRQ explanations; it does **not** change source answer provenance or modify canonical question/image files.
+
+The delivery adapter uses the existing bundled Pocket Cosmos compiler and publisher API, splitting independently compilable questions into a ready subset and reporting incompatible/unmapped/failed-answer questions in a high-priority local queue. The ready subset publishes in the existing atomic API and appears in the Practice catalog; verified v2 taxonomy and course metadata are necessary for Topic Practice eligibility. Production content versions stay immutable and repeat publishing is idempotent. Current high-priority queue is a local JSON report until a separate website intake API and UI are implemented.
+
+See \`skills/physics-bank-agent-loop/references/post-acceptance-delivery.md\` for the answer contract, execution command, verification, and deferred P2 raw-file upload adapters.

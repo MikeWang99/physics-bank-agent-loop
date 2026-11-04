@@ -1,0 +1,30 @@
+name: Post-acceptance delivery regression
+
+on:
+  push:
+    branches:
+      - main
+      - feat/post-acceptance-delivery-v1
+  pull_request:
+    paths:
+      - 'skills/physics-bank-agent-loop/**'
+      - 'tests/test_delivery.py'
+      - '.github/workflows/delivery-tests.yml'
+
+jobs:
+  delivery:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Syntax validation of delivery and original bundled publisher
+        run: |
+          python -m py_compile skills/physics-bank-agent-loop/scripts/delivery.py
+          python -m py_compile skills/physics-bank/skills/physics-bank-web-publisher/scripts/compile_publish_bundle.py
+          python -m py_compile skills/physics-bank/skills/physics-bank-web-publisher/scripts/validate_publish_bundle.py
+      - name: Post-acceptance regression suite
+        run: python -m unittest discover -s tests -p test_delivery.py -v

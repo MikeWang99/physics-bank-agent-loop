@@ -223,7 +223,43 @@ def sync_unpublished_issues(report: dict, practice_set_id: str) -> dict:
     return {"status": "stored", "stored": count}
 
 
-def run(bank: Path, config_file: Path, answers_file: Path, output_dir: Path, apply: bool) -> dict:
+def source_acceptance(bank: Path, questions: list, report_file: Path | None) -> dict[str, str]:
+    """Optional partial acceptance evidence from the unchanged source Reviewer.
+
+    Every question must have a separate disposition and evidence. Unaccepted
+    questions are quarantined; they cannot silently inherit whole-bank approval.
+    """
+    if report_file is None:
+        return {}
+    report = load(report_file)
+    if report.get("schema") != "physics-bank-source-acceptance/v1":
+        raise ValueError("Unknown partial source acceptance schema")
+    actual_sha = hashlib.sha256((bank / "questions.json").read_bytes()).hexdigest()
+    if report.get("sourceQuestionsSha256") != actual_sha:
+        raise ValueError("Partial acceptance report does not match source bank bytes")
+    if not str(report.get("reviewerId") or "").strip():
+        raise ValueError("Partial acceptance report requires an independent reviewer ID")
+    reviews = report.get("reviews")
+    if not isinstance(reviews, list):
+        raise ValueError("Partial acceptance report requires per-question reviews")
+    ids = {str(q["id"]) for q in questions}
+    status = {}
+    for row in reviews:
+        if not isinstance(row, dict) or row.get("questionId") not in ids:
+            raise ValueError("Acceptance report has unknown question ID")
+        qid = row["questionId"]
+        if qid in status or row.get("disposition") not in ("ACCEPT", "REVISE", "INCONCLUSIVE"):
+            raise ValueError("Acceptance report has invalid/duplicate disposition")
+        if not str(row.get("evidence") or "").strip():
+            raise ValueError("Acceptance report requires source-specific review evidence")
+        status[qid] = str(row["disposition"])
+    if set(status) != ids:
+        raise ValueError("Acceptance report must cover every original question")
+    return status
+
+
+def run(bank: Path, config_file: Path, answers_file: Path, output_dir: Path, apply: bool,
+        acceptance_report_file: Path | None = None) -> dict:
     bank, output_dir = bank.resolve(), output_dir.resolve()
     questions = load(bank / "questions.json").get("questions")
     assets = load(bank / "assets.json").get("assets")
@@ -254,11 +290,14 @@ def run(bank: Path, config_file: Path, answers_file: Path, output_dir: Path, app
     if not ps.get("subtitle"):
         label = "Multiple Choice" if ps.get("practice_kind") == "mcq" else "Structured Questions"
         ps["subtitle"] = f"{label} · {len(questions)} questions"
+    source_dispositions = source_acceptance(bank, questions, acceptance_report_file)
     compiler = import_compiler()
     ready, priority, normal = [], [], []
     for pos, question in enumerate(questions):
         qid = original_ids[pos]
         try:
+            if source_dispositions and source_dispositions.get(qid) != "ACCEPT":
+                raise ValueError("independent source review disposition: " + str(source_dispositions[qid]))
             if qid not in indexed:
                 raise ValueError("missing independently verified standardized answer")
             answer = reviewed_answer(indexed[qid], question)
@@ -353,8 +392,10 @@ def main() -> int:
     parser.add_argument("reviewed_answers", type=Path)
     parser.add_argument("--output-dir", required=True, type=Path)
     parser.add_argument("--apply", action="store_true", help="publish ready questions through the existing production API")
+    parser.add_argument("--acceptance-report", type=Path, help="optional per-question independent source acceptance report for partial batches")
     args = parser.parse_args()
-    report = run(args.bank, args.publish_config, args.reviewed_answers, args.output_dir, args.apply)
+    report = run(args.bank, args.publish_config, args.reviewed_answers, args.output_dir, args.apply,
+                 args.acceptance_report)
     print(json.dumps({k: report[k] for k in ("sourceQuestionCount", "readyCount", "highPriorityCount", "published")}))
     return 0
 

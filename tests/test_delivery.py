@@ -100,6 +100,53 @@ class MixedBatchTests(unittest.TestCase):
             delivery.run(Path("/bad/bank"), Path("/bad/config"), Path("/bad/answers"), Path("/tmp/delivery-test-no-write"), True)
 
 
+    def test_image_bytes_and_layout_are_preserved_after_delivery(self):
+        import base64
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            bank = root / "bank"
+            (bank / "assets").mkdir(parents=True)
+            # Tiny fixture has a real PNG signature. The delivery adapter
+            # must preserve bytes/asset identity regardless of answer overlays.
+            png = base64.b64decode(
+                "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jS5kAAAAASUVORK5CYII="
+            )
+            image = bank / "assets/figure.png"
+            image.write_bytes(png)
+            blocks = [{"type": "text", "text": "Inspect the diagram."},
+                      {"type": "figure", "asset_id": "fig-01"}]
+            question = {"id": "q001", "stem": "Inspect the diagram.",
+                        "choices": [{"label": "A", "text": "Zero"}, {"label": "B", "text": "Non-zero"}],
+                        "answer": {"label": "B"}, "asset_ids": ["fig-01"], "layout_blocks": blocks}
+            delivery.dump(bank / "questions.json", {"schema_version": "2.0", "questions": [question]})
+            delivery.dump(bank / "assets.json", {"schema_version": "2.0", "assets": [
+                {"id": "fig-01", "file": "assets/figure.png", "role": "stem", "source": {}}
+            ]})
+            delivery.dump(bank / "classification-taxonomy.json", {"course": "AP Physics 1"})
+            config = root / "config.json"
+            delivery.dump(config, {"schema": "pocket-cosmos-publish-config/v1",
+                                   "practice_set": {"id": "image-regression", "system": "ap-physics-1",
+                                                    "practice_kind": "mcq", "title": "Image regression"}})
+            answers = root / "answers.json"
+            delivery.dump(answers, {"schema": delivery.ANSWERS_SCHEMA, "questions": [
+                {"id": "q001", "kind": "mcq", "correct_labels": ["B"],
+                 "detailed_explanation": "Check the original figure and use $F=ma$.",
+                 "creator": {"id": "writer"},
+                 "reviewer": {"id": "independent-verifier", "independent": True,
+                              "verdict": "ACCEPT", "notes": "Verified original diagram and B."}}
+            ]})
+            original_bank = (bank / "questions.json").read_bytes()
+            original_hash = delivery.hashlib.sha256(png).hexdigest()
+            report = delivery.run(bank, config, answers, root / "result", False)
+            self.assertEqual(report["readyCount"], 1)
+            self.assertEqual(original_bank, (bank / "questions.json").read_bytes())
+            self.assertEqual(original_hash, delivery.file_sha256(image) if hasattr(delivery, "file_sha256") else delivery.hashlib.sha256(image.read_bytes()).hexdigest())
+            published = delivery.load(root / "result/web-publish-ready.json")["questions"][0]
+            self.assertEqual(published["version"]["metadata"]["physicsBank"]["layoutBlocks"], blocks)
+            self.assertEqual(len(published["assets"]), 1)
+            self.assertEqual(published["assets"][0]["sha256"], original_hash)
+            self.assertEqual(published["assets"][0]["metadata"]["slot"], "image")
+
     def test_valid_question_prepares_while_unverified_question_goes_to_priority(self):
         with tempfile.TemporaryDirectory() as folder:
             base = Path(folder)

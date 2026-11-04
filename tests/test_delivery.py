@@ -95,6 +95,11 @@ class AnswerContractTests(unittest.TestCase):
 
 
 class MixedBatchTests(unittest.TestCase):
+    def test_apply_needs_source_acceptance(self):
+        with self.assertRaisesRegex(ValueError, "explicit full source ACCEPT"):
+            delivery.run(Path("/bad/bank"), Path("/bad/config"), Path("/bad/answers"), Path("/tmp/delivery-test-no-write"), True)
+
+
     def test_valid_question_prepares_while_unverified_question_goes_to_priority(self):
         with tempfile.TemporaryDirectory() as folder:
             base = Path(folder)

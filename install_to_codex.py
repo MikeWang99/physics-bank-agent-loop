@@ -10,7 +10,8 @@ SKILLS_SOURCE = REPO_ROOT / "skills"
 SKILLS_TARGET = CODEX_HOME / "skills"
 ROLE_SOURCE = REPO_ROOT / "skills" / "physics-bank-agent-loop" / "agents"
 ROLE_TARGET = CODEX_HOME / "agents"
-ROLE_FILES = ("physics_bank_creator.toml", "physics_bank_reviewer.toml")
+ROLE_FILES = ("physics_bank_creator.toml", "physics_bank_reviewer.toml",
+              "physics_bank_answer_writer.toml", "physics_bank_answer_verifier.toml")
 
 
 def install_tree(source: Path, target: Path) -> None:
@@ -44,4 +45,4 @@ except Exception as exc:
     raise SystemExit(1)
 
 print(f"Installed skills: {SKILLS_TARGET / 'physics-bank-agent-loop'} and {SKILLS_TARGET / 'physics-bank'}")
-print(f"Installed role profiles: {ROLE_TARGET / ROLE_FILES[0]} and {ROLE_TARGET / ROLE_FILES[1]}")
+print("Installed role profiles: " + ", ".join(str(ROLE_TARGET / filename) for filename in ROLE_FILES))

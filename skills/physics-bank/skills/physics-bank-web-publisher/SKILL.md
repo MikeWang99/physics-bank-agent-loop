@@ -281,6 +281,7 @@ Practice library and Topic Practice are separate product routes. A catalog entry
 3. Before reporting delivery complete, record PASS/FAIL/BLOCKED_AUTH independently for both routes, with expected and observed counts. Do not treat a question ID, course subtopic ID and primary knowledge UID as interchangeable.
 
 If the authenticated topic index or browser cannot be checked, report the bank as published and the relevant route as unverified. A 401, 403 or sign-in prompt means access was not verified; it is neither proof of a missing mapping nor proof that the questions display. Do not grant permissions or bypass authentication to manufacture a pass.
+
 ## Versioning rules
 
 `questions.id` is stable identity. `question_versions` is immutable history.

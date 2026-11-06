@@ -103,6 +103,65 @@ def question_math_issues(question: dict) -> list[str]:
     return issues
 
 
+
+# The source's original printed figure numbers stay in provenance only.
+_SOURCE_FIG_REF = re.compile(
+    r"\b(?:fig(?:ure)?\.?\s*\d+\s*[-–—]\s*\d+|"
+    r"fig(?:ure)?\.?\s*\d+\s*[a-z]|"
+    r"(?:source[- ]derived\s+)?(?:figure|diagram)\s+description)\b", re.I,
+)
+_SOURCE_PAGE_REF = re.compile(r"\b(?:pdf\s*p(?:age)?\.?|printed\s*p(?:age)?\.?)\s*\d+\b", re.I)
+_UNVERIFIED_NEGLECT = re.compile(
+    r"\b(?:ignore|neglect)\s+(?:all\s+|the\s+)?"
+    r"(?P<force>friction|air\s+resistance|drag)\b", re.I,
+)
+
+
+def student_source_fidelity_issues(question: dict, stem_asset_ids: list[str]) -> list[str]:
+    """Reject source-numbered captions, missing owned figures and invented assumptions.
+
+    Source-page comparison by an independent reviewer remains mandatory; this
+    deterministic gate catches common regressions without rewriting physics.
+    """
+    qid = str(question.get("id") or "<missing-id>")
+    text = "\n".join(str(question.get(k) or "") for k in ("context", "stem", "stem_markdown"))
+    extraction = question.get("extraction") or {}
+    if not isinstance(extraction, dict):
+        extraction = {}
+    source = "\n".join(str(extraction.get(k) or "") for k in (
+        "raw_source_text", "source_visual_transcription",
+    ))
+    problems: list[str] = []
+    if _SOURCE_FIG_REF.search(text) or _SOURCE_PAGE_REF.search(text):
+        problems.append(
+            f"{qid}: student-facing text contains an original textbook figure/page "
+            "reference or source-description note; link this question's own figure instead"
+        )
+    for found in _UNVERIFIED_NEGLECT.finditer(text):
+        noun = re.sub(r"\s+", " ", found.group("force").lower())
+        original = re.compile(
+            r"\b(?:ignore|neglect)\s+(?:all\s+|the\s+)?"
+            + re.escape(noun).replace(r"\ ", r"\s+") + r"\b", re.I,
+        )
+        if not original.search(source):
+            problems.append(
+                f"{qid}: '{found.group(0)}' is an unverified physical assumption "
+                "absent from the original source transcription"
+            )
+    evidence = extraction.get("source_layout_evidence") or {}
+    has_figure_evidence = (
+        isinstance(evidence, dict) and
+        isinstance(evidence.get("figure_evidence"), dict) and
+        bool(evidence["figure_evidence"].get("id"))
+    )
+    if (has_figure_evidence or _SOURCE_FIG_REF.search(source)) and not stem_asset_ids:
+        problems.append(
+            f"{qid}: original figure is referenced but no owned stem/shared "
+            "figure asset is attached; never replace a needed figure with a note"
+        )
+    return problems
+
+
 def _label(value) -> str:
     return str(value or "").strip().upper()
 
@@ -576,6 +635,8 @@ def validate(questions_path: Path, assets_path: Path | None, strict: bool, requi
             aid for aid in top_ids
             if (asset_index.get(aid) or {}).get("role") in {"stem", "shared"}
         ]
+        fidelity_issues = student_source_fidelity_issues(q, stem_shared_ids)
+        (errors if strict else warnings).extend(fidelity_issues)
         layout_blocks = q.get("layout_blocks")
         if strict and stem_shared_ids and not layout_blocks:
             errors.append(f"{qid}: stem/shared visual assets require explicit layout_blocks in v2.3 strict mode")

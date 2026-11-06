@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.0.0-rc.2 — 2026-11-06 (feature branch, NOT production)
+
+- Requires separate live verification of Practice course-subtopic placement and
+  unified Topic Practice primary-knowledge-UID placement after publication.
+- Records PASS, FAIL, or BLOCKED_AUTH per route; authentication or entitlement
+  gaps remain unverified and cannot be reported as successful placement.
+- Updates the Web Publisher candidate to 1.2.0-rc.2. No website schema,
+  permissions, or production data are changed by this documentation update.
+
 ## 3.0.0-rc.1 — 2026-10-26 (feature branch, NOT production)
 
 - Based on main 6338dbb3d7000b1fa3b3842825374de5e4de298f with VERSION=2.9.0;

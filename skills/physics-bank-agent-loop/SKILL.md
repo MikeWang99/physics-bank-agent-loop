@@ -20,6 +20,8 @@ Use the role definitions in `agents/physics_bank_creator.toml` and `agents/physi
 1. Give Creator the user's request, source paths, output location, and explicit scope. For a review-only task, skip creation and start at step 2.
 2. After Creator finishes, give Reviewer the user request, source paths, and bank path. On the first review, do not pass Creator's conclusions or proposed fixes.
 3. Reviewer returns `ACCEPT` or `REVISE`. Each finding includes severity, question ID, exact file/field, source-page or taxonomy evidence, and a concrete correction. Uncertainty is `INCONCLUSIVE`, never silently accepted.
+
+   **Mandatory visual/source-fidelity checks:** For every source-referenced figure, match original question number/page/figure ID (not the new bank index), verify the reviewed figure asset belongs to that final question and appears in its own layout, and ensure learner text does not contain `Fig. X–Y`, `Source figure description` or PDF page numbers. Check every added physical qualifier such as `[Ignore friction.]` against *explicit* source wording, including any verified shared setup. A crop that cannot isolate the source figure means `REVISE/INCONCLUSIVE`, not an invented text substitute or acceptance.
 4. If `REVISE`, send only the findings and relevant evidence to Creator. Creator records changes and reruns the Physics Bank validators. Then send Reviewer the revised bank and prior finding list for a fresh check of every finding and regressions.
 5. Repeat sequentially until Reviewer returns `ACCEPT`, all required validators pass, and no blocking or inconclusive item remains. After five repair rounds without acceptance, stop and report what remains; do not label the bank OK.
 

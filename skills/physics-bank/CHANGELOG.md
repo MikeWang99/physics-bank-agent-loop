@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.0.0-rc.3 — 2026-11-06 (source fidelity hardening)
+
+- Prevent source textbook diagram numbers (e.g. Fig. 4–58), PDF/printed page citations and "Source figure description" editor notes from leaking into learner-facing question stems.
+- Reject source-referenced figures with no question-owned reviewed stem/shared figure asset, even when an overlapping source graphic is difficult to crop; quarantine for source review rather than accepting a text-only replacement.
+- Detect unsupported "Ignore friction", "Neglect air resistance", and related added physical assumptions when source transcriptions do not explicitly contain the qualifier.
+- Add independent Creator/Reviewer source-fidelity rules and focused validator regression tests (Giancoli-like Figure and friction examples).
+- Does not rewrite original source PDFs, change TIMBAD scoring, alter published banks or touch website storage. Repairs to previously published questions require separate audited question-version updates.
+
 ## 3.0.0-rc.2 — 2026-11-06 (feature branch, NOT production)
 
 - Requires separate live verification of Practice course-subtopic placement and

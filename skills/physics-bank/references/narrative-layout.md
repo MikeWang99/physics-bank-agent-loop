@@ -134,3 +134,11 @@ For `before` / `after`, the anchor text must occur in the textual narrative. Use
 7. Only then set `layout_review.reviewed: true`.
 
 If the correct placement cannot be established confidently, keep the question in manual review.
+
+## Cross-book numbering and no text-only figure substitution
+
+Original `Fig. X–Y` labels, source page numbers and PDF page numbers are **not** stable learner-facing references: the published bank is a different sequence. They remain in `source` and `extraction` metadata, while the actual source figure is linked to its own final question by `asset_ids` and one ordered `figure` layout block. If two questions in the source refer to the same diagram, explicitly give each final question ownership through a reviewed shared/duplicated asset; never rely on the adjacent bank question.
+
+An overlapping source PDF vector/text region is NOT permission to replace the figure with “Source figure description (Fig. ... PDF p. ...)”. Treat the item as `requires_manual_review`, examine an alternate higher-resolution/vector source crop and manually verify any independently redrawn figure. If the exact visual cannot be safely published, hold the item. A concise descriptive sentence may clarify a physical relationship only when source-supported, but it cannot replace a required figure.
+
+When converting the literal printed source reference to “the diagram” or deleting the redundant printed label, leave physical conditions unchanged and record the source evidence in extraction metadata. Independently compare the final student rendering, not only the JSON IDs, to the actual source question.

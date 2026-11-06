@@ -137,16 +137,34 @@ def student_source_fidelity_issues(question: dict, stem_asset_ids: list[str]) ->
             f"{qid}: student-facing text contains an original textbook figure/page "
             "reference or source-description note; link this question's own figure instead"
         )
+    # A textbook section heading may apply to many individual questions.
+    # Preserve original-source evidence in structured metadata; do not guess
+    # that every question in a chapter shares a condition without a checked
+    # heading and explicit source-page provenance.
+    shared = extraction.get("shared_source_instructions") or []
+    verified_shared = []
+    if isinstance(shared, list):
+        for note in shared:
+            if (isinstance(note, dict)
+                and note.get("reviewed") is True
+                and isinstance(note.get("source_page"), int)
+                and note["source_page"] > 0
+                and isinstance(note.get("text"), str)
+                and note["text"].strip()
+                and isinstance(note.get("source_heading"), str)
+                and note["source_heading"].strip()):
+                verified_shared.append(note["text"])
+    source_conditions = "\n".join([source, *verified_shared])
     for found in _UNVERIFIED_NEGLECT.finditer(text):
         noun = re.sub(r"\s+", " ", found.group("force").lower())
         original = re.compile(
             r"\b(?:ignore|neglect)\s+(?:all\s+|the\s+)?"
             + re.escape(noun).replace(r"\ ", r"\s+") + r"\b", re.I,
         )
-        if not original.search(source):
+        if not original.search(source_conditions):
             problems.append(
                 f"{qid}: '{found.group(0)}' is an unverified physical assumption "
-                "absent from the original source transcription"
+                "absent from the original source and verified shared instructions"
             )
     evidence = extraction.get("source_layout_evidence") or {}
     has_figure_evidence = (

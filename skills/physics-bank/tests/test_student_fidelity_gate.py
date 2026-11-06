@@ -54,6 +54,31 @@ class StudentSourceFidelityTests(unittest.TestCase):
         self.assertTrue(any("unverified physical assumption" in e for e in
                             bank.student_source_fidelity_issues(q, [])))
 
+    def test_verified_section_heading_allows_shared_ignore_friction(self):
+        # Giancoli Global Edition 7e, printed p. 102 / PDF p. 123:
+        # "4-7 Newton's Laws and Vectors [Ignore friction.]"
+        q = self.question("[Ignore friction.] A rope lifts a box.",
+                          "A rope lifts a box.")
+        q["extraction"]["shared_source_instructions"] = [{
+            "text": "[Ignore friction.]",
+            "source_heading": "4-7 Newton's Laws and Vectors",
+            "source_page": 123,
+            "reviewed": True,
+        }]
+        self.assertEqual(bank.student_source_fidelity_issues(q, []), [])
+
+    def test_unverified_shared_heading_does_not_allow_invented_assumptions(self):
+        for note in (
+            {"text": "[Ignore friction.]", "source_page": 123, "source_heading": "4-7 Newton's Laws and Vectors"},
+            {"text": "[Ignore friction.]", "source_page": 123, "reviewed": True},
+            {"text": "[Ignore friction.]", "source_heading": "4-7 Newton's Laws and Vectors", "reviewed": True},
+        ):
+            with self.subTest(note=note):
+                q = self.question("[Ignore friction.] A rope lifts a box.", "A rope lifts a box.")
+                q["extraction"]["shared_source_instructions"] = [note]
+                self.assertTrue(any("unverified physical assumption" in e
+                                    for e in bank.student_source_fidelity_issues(q, [])))
+
     def test_source_supported_ignore_air_resistance_is_allowed(self):
         q = self.question("Ignore air resistance. A stone falls.",
                           "Ignore air resistance. A stone falls.")

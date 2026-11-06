@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.0.0-rc.4 — 2026-11-06 (verified section-wide instructions)
+
+- Correct false positives from rc.3 when a physical condition is stated once in an original textbook section heading rather than repeated in every numbered question.
+- Preserve exact source-page heading and instruction evidence in reviewed `extraction.shared_source_instructions`; accept them only with verified positive page number and heading text, never from unreviewed generated metadata.
+- Add Giancoli GE §4-7 p. 102 (PDF p. 123) regression: `[Ignore friction.]` really is present as a shared instruction for Questions 20–34; avoid labeling it an AI hallucination. Keep it as a real physical assumption in standalone problem context.
+- Existing original figure-reference, missing owned figure and unverified assumption hard gates remain.
+
 ## 3.0.0-rc.3 — 2026-11-06 (source fidelity hardening)
 
 - Prevent source textbook diagram numbers (e.g. Fig. 4–58), PDF/printed page citations and "Source figure description" editor notes from leaking into learner-facing question stems.

@@ -25,6 +25,8 @@ The audit trail keeps the unchanged source statement, including `Fig. 4–58` an
 
 No physics assumptions may be introduced merely to make a solvable classroom exercise. An added `[Ignore friction.]`, `Neglect air resistance`, or “frictionless” condition requires explicit wording or a genuinely shared instruction in the source, recorded with page provenance. The reviewer checks the source's *actual* conditions, not what would be convenient for a solution.
 
+For a section-wide condition absent from each individual printed stem, record `extraction.shared_source_instructions: [{"text":"[Ignore friction.]","source_heading":"4-7 Newton's Laws and Vectors","source_page":123,"reviewed":true}]` **only after visual source-page confirmation** (Giancoli GE printed p. 102, PDF p. 123). A missing `reviewed`, `source_heading`, or `source_page` does not establish evidence. Keep the physical condition in standalone learner text/context rather than silently dropping it, but avoid repeatedly presenting raw editorial brackets when a natural, accurate standalone statement is possible.
+
 ## Hard gate
 
 Run:

@@ -66,6 +66,10 @@ Current Pocket Cosmos already has \`/api/ai/physics-bank/imports\`, \`/api/pract
 
 The topic index requires more than a matching UUID: v2 classification status, reviewed flag, taxonomy SHA, approved or appropriately unrated difficulty, source-system equality and course entitlement must agree. A previously uploaded item that does not meet those gates can appear in the Practice set but not Topic Practice. Diagnose these exact predicates first; never mutate the pinned taxonomy.
 
+Practice and Topic Practice use different mappings. The Practice course tree filters by the course subtopic in `practiceStep.curriculum.primarySubtopicId`; unified Topic Practice filters by the canonical taxonomy value in `physicsBank.classification.primary_knowledge_uid`, mirrored by `physicsBank.primaryKnowledgeUid` and `practiceStep.primaryKnowledgeUid`. The publisher's UID, taxonomy hash, course projection node ID and primary subtopic must agree with the reviewed bank. A unique question ID identifies the question; it is not a knowledge-tree UID.
+
+For a requested production release, verify both routes separately after publish. Compare the Practice catalog paths and per-subtopic question IDs/counts with the bundle. For Topic Practice, call the authorized topic-question API once for every mapped primary UID and compare the returned question IDs/counts; then visually open representative mapped nodes in an entitled signed-in session. Record the two route results separately. If authentication or entitlement is unavailable, mark that route unverified and report “published; authenticated placement unverified”; a 401/403 or sign-in screen cannot be counted as successful UI verification.
+
 The cloud review editor currently blocks v2/TIMBAD edits. Website repair requires a separate migration/API/UI change to preserve provenance and create immutable versions. Do not describe the local report as a finished web review queue, or claim the website has been updated just because this skill generated a bundle.
 
 ## P2 (design only, not implemented)

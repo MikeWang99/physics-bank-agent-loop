@@ -271,6 +271,16 @@ After apply:
 
 For locked practice sets, a 403 from the public API is not evidence of failed publication. Use the successful API response's database verification instead; do not request a Supabase service-role key in the AI environment.
 
+
+### Required dual-surface verification
+
+Practice library and Topic Practice are separate product routes. A catalog entry, successful import, matching set ID, or valid taxonomy UID does not by itself prove that a learner can reach every question from both routes.
+
+1. **Practice library** (`/zh/practice`): compare the live catalog's set ID, question count and curriculum paths with the publish bundle. For every course subtopic ID in the bundle, confirm the expected question IDs/count and open its point filter to verify it leads to the correct set.
+2. **Topic Practice** (`/zh/topic-practice`): use each question's canonical primary knowledge UID from the reviewed classification. Through a signed-in account entitled to the set's source system, query `/api/topic-practice/questions?node=<uid>` for every mapped UID; compare returned question IDs with the expected IDs for that node and descendants. Open the corresponding topic route and confirm a non-empty list and matching count.
+3. Before reporting delivery complete, record PASS/FAIL/BLOCKED_AUTH independently for both routes, with expected and observed counts. Do not treat a question ID, course subtopic ID and primary knowledge UID as interchangeable.
+
+If the authenticated topic index or browser cannot be checked, report the bank as published and the relevant route as unverified. A 401, 403 or sign-in prompt means access was not verified; it is neither proof of a missing mapping nor proof that the questions display. Do not grant permissions or bypass authentication to manufacture a pass.
 ## Versioning rules
 
 `questions.id` is stable identity. `question_versions` is immutable history.

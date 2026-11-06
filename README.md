@@ -5,7 +5,7 @@ A reusable Creator → independent Reviewer workflow for building and repairing 
 ## What is included
 
 - `skills/physics-bank-agent-loop/`: coordinator workflow, Creator and Reviewer role profiles, and Codex metadata.
-- `skills/physics-bank/`: the complete Physics Bank skill snapshot used by the workflow (version `3.0.0-rc.1`), including its references, scripts, validators, tests, and nested publisher skill.
+- `skills/physics-bank/`: the complete Physics Bank skill snapshot used by the workflow (version `3.0.0-rc.2`), including its references, scripts, validators, tests, and nested publisher skill.
 - `ARCHITECTURE.md`: roles, handoff sequence, review contract, and acceptance gate.
 - `install_to_codex.py`: installs both skills and the role profiles into the current Codex home.
 

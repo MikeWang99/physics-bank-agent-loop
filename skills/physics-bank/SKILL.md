@@ -53,6 +53,15 @@ Read `references/answer-extraction.md`, `references/text-extraction.md`, `refere
 
 Never infer omitted clauses from physics knowledge. Uncertain symbols/sentences require manual review; an absent year alone does not block v2 publication.
 
+### Original textbook figure references and physical-assumption audit — required
+
+- Preserve the original printed `Fig. 4–58`, `Figure 4-59`, PDF page and other source identifiers **only** in `raw_source_text`, `source`, `extraction` and the asset manifest. They are NOT part of a reusable, self-contained student-facing stem.
+- A learner-facing question refers only to **its own attached diagram**, e.g. “the diagram” / “the figure shown”, or omits the reference when genuinely redundant. Never emit `See Fig. 4–58`, `Source figure description`, `Fig. ... PDF p. ...` or the source's printed figure number in `context`, `stem`, choices or `layout_blocks` text. This is narrowly scoped de-referencing, not permission to paraphrase or change the problem.
+- For every source question that references a source figure, attach a reviewed `stem/shared` asset owned by that final question and place it exactly once in `layout_blocks`. The original question numbers and the new bank sequence may differ: resolve by source page, source figure ID and original question identity, **never** by ordinal position.
+- If a figure touches neighboring PDF prose, inspect the source at higher resolution, isolate vector/drawing elements or reconstruct an independently reviewed faithful diagram as a last resort. If faithful isolation is still uncertain, mark `requires_manual_review` and **do not publish**. A bare “Source figure description” paragraph is not an acceptable replacement for the required visual.
+- Do not insert `[Ignore friction.]`, `Ignore air resistance`, “frictionless”, “massless pulley” or other physical assumptions unless that assumption is explicitly supported by the original question or a verified shared instruction. Proving a physical model in a solution is NOT evidence that the question stated that assumption. Record the original shared instruction verbatim in `context` where needed, and keep its source-page evidence.
+- Before Reviewer acceptance, compare each student-facing condition against the source text and diagram. The strict validator detects numbered source figure leaks, missing source-mentioned figures, and unsupported ignore/neglect friction or drag; an independent reviewer must additionally catch semantic inventions the regex cannot detect.
+
 ## Stage B — source-faithful normalization
 
 Create stable final IDs, preserve available year/source metadata, attach answer evidence, and normalize mathematical notation to canonical `markdown+latex`. Missing official answers remain `not-provided`; do not solve merely to fill the answer field.

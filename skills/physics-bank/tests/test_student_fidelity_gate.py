@@ -57,6 +57,17 @@ class StudentSourceFidelityTests(unittest.TestCase):
     def test_verified_section_heading_allows_shared_ignore_friction(self):
         # Giancoli Global Edition 7e, printed p. 102 / PDF p. 123:
         # "4-7 Newton's Laws and Vectors [Ignore friction.]"
+        q = self.question("Assume friction is negligible. A rope lifts a box.",
+                          "A rope lifts a box.")
+        q["extraction"]["shared_source_instructions"] = [{
+            "text": "[Ignore friction.]",
+            "source_heading": "4-7 Newton's Laws and Vectors",
+            "source_page": 123,
+            "reviewed": True,
+        }]
+        self.assertEqual(bank.student_source_fidelity_issues(q, []), [])
+
+    def test_verified_section_heading_is_not_copied_verbatim_as_editorial_prefix(self):
         q = self.question("[Ignore friction.] A rope lifts a box.",
                           "A rope lifts a box.")
         q["extraction"]["shared_source_instructions"] = [{
@@ -65,6 +76,12 @@ class StudentSourceFidelityTests(unittest.TestCase):
             "source_page": 123,
             "reviewed": True,
         }]
+        problems = bank.student_source_fidelity_issues(q, [])
+        self.assertTrue(any("copied verbatim" in e for e in problems), problems)
+
+    def test_question_level_source_instruction_remains_allowed(self):
+        q = self.question("Ignore friction. A rope lifts a box.",
+                          "Ignore friction. A rope lifts a box.")
         self.assertEqual(bank.student_source_fidelity_issues(q, []), [])
 
     def test_unverified_shared_heading_does_not_allow_invented_assumptions(self):
@@ -97,3 +114,4 @@ class StudentSourceFidelityTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

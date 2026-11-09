@@ -2,7 +2,7 @@
 
 ## Scope
 
-This repository packages the question-bank production and independent-review part of the Pocket Cosmos multi-agent design. `skills/physics-bank-agent-loop/SKILL.md` and the role profiles are the operational contract. The bundled `skills/physics-bank/` directory is the Creator's required production skill and is pinned here as a complete snapshot (`3.0.0-rc.1`).
+This repository packages the question-bank production and independent-review part of the Pocket Cosmos multi-agent design. `skills/physics-bank-agent-loop/SKILL.md` and the role profiles are the operational contract. The bundled `skills/physics-bank/` directory is the Creator's required production skill and is pinned here as a complete snapshot (`3.0.0-rc.5`); its nested Web Publisher remains `1.2.0-rc.2`.
 
 ## Roles
 
@@ -37,6 +37,7 @@ The Coordinator may report the bank accepted only when all of the following hold
 - The Reviewer returns `ACCEPT`.
 - Every required validator passes.
 - No blocking or inconclusive finding remains.
+- The independent report records the exact learner-facing prompt and figure audit for every question.
 - The result still satisfies the user's original scope, including any question-range limit.
 
 The Reviewer never edits bank files. The Creator never approves its own work. The Coordinator owns sequencing and final reporting.
@@ -53,3 +54,4 @@ The original Coordinator → Creator → independent read-only Reviewer source l
 The delivery adapter uses the existing bundled Pocket Cosmos compiler and publisher API, splitting independently compilable questions into a ready subset and reporting incompatible/unmapped/failed-answer questions in a high-priority local queue. The ready subset publishes in the existing atomic API and appears in the Practice catalog; verified v2 taxonomy and course metadata are necessary for Topic Practice eligibility. Production content versions stay immutable and repeat publishing is idempotent. Current high-priority queue is a local JSON report until a separate website intake API and UI are implemented.
 
 See \`skills/physics-bank-agent-loop/references/post-acceptance-delivery.md\` for the answer contract, execution command, verification, and deferred P2 raw-file upload adapters.
+

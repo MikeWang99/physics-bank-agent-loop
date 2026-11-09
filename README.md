@@ -1,15 +1,15 @@
 # Physics Bank Agent Loop
 
-A reusable Creator → independent Reviewer workflow for building and repairing physics question banks. The repository packages the architecture, its Codex skill and role profiles, and the Physics Bank skill that the Creator must follow.
+A reusable Creator → independent Reviewer workflow for building and repairing physics question banks. The repository packages Agent Loop `1.2.0`, its Codex skill and role profiles, and the Physics Bank `3.0.0-rc.5` snapshot that the Creator must follow.
 
 ## What is included
 
 - `skills/physics-bank-agent-loop/`: coordinator workflow, Creator and Reviewer role profiles, and Codex metadata.
-- `skills/physics-bank/`: the complete Physics Bank skill snapshot used by the workflow (version `3.0.0-rc.2`), including its references, scripts, validators, tests, and nested publisher skill.
+- `skills/physics-bank/`: the complete Physics Bank skill snapshot used by the workflow (version `3.0.0-rc.5`), including its references, scripts, validators, tests, and nested Publisher `1.2.0-rc.2`.
 - `ARCHITECTURE.md`: roles, handoff sequence, review contract, and acceptance gate.
 - `install_to_codex.py`: installs both skills and the role profiles into the current Codex home.
 
-The workflow does not treat a Creator's self-review as independent acceptance. The Reviewer stays read-only, and the Coordinator keeps creation and review serial so both roles never edit the same bank at once.
+The workflow does not treat a Creator's self-review as independent acceptance. The Reviewer stays read-only, and the Coordinator keeps creation and review serial so both roles never edit the same bank at once. Acceptance now includes a per-question audit of the exact learner prompt and its attached figures.
 
 ## Install
 
@@ -34,3 +34,4 @@ The bundled skill is a versioned snapshot. When updating it, copy the complete s
 The original high-quality source extraction/asset review and independent Creator/Reviewer loop remain unchanged. The optional new delivery phase can generate standardized reviewed student answers, compile per question, quarantine incompatible items without blocking valid questions, and pass the ready subset to the **already existing** Pocket Cosmos production publisher API. See \`skills/physics-bank-agent-loop/references/post-acceptance-delivery.md\` and \`skills/physics-bank-agent-loop/scripts/delivery.py\`.
 
 This first-stage change is **not** a direct PDF/DOCX/image upload web endpoint or a completed online high-priority review queue. Those website-facing endpoints, plus v2/TIMBAD cloud editing, remain follow-on integration work. Publish defaults to preflight; only \`--apply\` makes production writes.
+

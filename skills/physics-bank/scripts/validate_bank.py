@@ -118,7 +118,7 @@ _UNVERIFIED_NEGLECT = re.compile(
 
 
 def student_source_fidelity_issues(question: dict, stem_asset_ids: list[str]) -> list[str]:
-    """Reject source-numbered captions, missing owned figures and invented assumptions.
+    """Reject source-numbered captions, missing owned figures and unsupported assumptions.
 
     Source-page comparison by an independent reviewer remains mandatory; this
     deterministic gate catches common regressions without rewriting physics.
@@ -154,14 +154,21 @@ def student_source_fidelity_issues(question: dict, stem_asset_ids: list[str]) ->
                 and isinstance(note.get("source_heading"), str)
                 and note["source_heading"].strip()):
                 verified_shared.append(note["text"])
-    source_conditions = "\n".join([source, *verified_shared])
     for found in _UNVERIFIED_NEGLECT.finditer(text):
         noun = re.sub(r"\s+", " ", found.group("force").lower())
         original = re.compile(
             r"\b(?:ignore|neglect)\s+(?:all\s+|the\s+)?"
             + re.escape(noun).replace(r"\ ", r"\s+") + r"\b", re.I,
         )
-        if not original.search(source_conditions):
+        if original.search(source):
+            # Question-level source wording is already faithful. Keep it.
+            continue
+        if any(original.search(note) for note in verified_shared):
+            problems.append(
+                f"{qid}: '{found.group(0)}' is copied verbatim from a verified shared "
+                "instruction; express the condition naturally in learner-facing text"
+            )
+        else:
             problems.append(
                 f"{qid}: '{found.group(0)}' is an unverified physical assumption "
                 "absent from the original source and verified shared instructions"
@@ -943,3 +950,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+

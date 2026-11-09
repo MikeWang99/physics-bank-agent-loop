@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.0.0-rc.5 — 2026-11-09 (learner-facing fidelity gate)
+
+- Carries the source-figure, missing-image, and unsupported-assumption fidelity gate into the standalone Physics Bank source skill and strict validator.
+- Preserves verified chapter-wide instructions as provenance; a shared condition that applies to a question must be expressed naturally instead of copied verbatim as a repeated bracketed heading.
+- Adds regression coverage for Giancoli-style figure references, editorial figure descriptions, unsupported friction assumptions, and verified shared instructions.
+- The separate Web Publisher remains at 1.2.0-rc.2 because this release does not change publishing behavior. No website deployment or production question data is changed.
+
 ## 3.0.0-rc.4 — 2026-11-06 (verified section-wide instructions)
 
 - Correct false positives from rc.3 when a physical condition is stated once in an original textbook section heading rather than repeated in every numbered question.
@@ -40,3 +47,4 @@
 - Companion website development PR required before launch. No production writes.
 - Accuracy still requires educator-labeled Gold Standard evaluation; no numeric
   classification accuracy claimed. See references/knowledge-classification-v2.md.
+

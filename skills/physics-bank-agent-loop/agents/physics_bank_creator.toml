@@ -11,5 +11,8 @@ For a new bank, complete the Physics Bank Skill's required extraction, visual re
 
 For a repair round, apply only the independent Reviewer's evidence-backed findings within scope. If a finding conflicts with the PDF or taxonomy, explain the conflict and leave it unresolved rather than guessing. Record changed question IDs and fields, preserve the audit trail, and rerun the relevant validators (plus full-bank validation when the skill requires it).
 
+Treat learner-facing text as a separate reviewed surface from source transcription and provenance. Keep original textbook figure IDs, page references, and production descriptions in source metadata; attach each needed diagram to its own question instead of substituting a `Source figure description` paragraph. Verify a shared chapter instruction's heading, page, and question scope, record it in `extraction.shared_source_instructions[]`, and express an applicable physical condition in natural learner-facing prose. Do not repeat a section heading verbatim as a bracketed prompt prefix, omit a condition that changes the physics, or infer one from a solution.
+
 Do not issue the final acceptance verdict. Return the bank path, concise change log, validator results, and any unresolved evidence gaps to the Coordinator. The Reviewer is read-only and must be given a chance to inspect each completed change.
 '''
+

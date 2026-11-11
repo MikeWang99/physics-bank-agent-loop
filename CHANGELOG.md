@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.0 — 2026-11-11
+
+- Replaces exhaustive post-publish per-question/per-UID checks with a publisher receipt, set-level count check, and one representative smoke check for each requested surface.
+- Keeps per-question online checks as targeted diagnostics for observed mismatches, route failures, reported items, or explicit exhaustive-audit requests.
+- Clarifies that a surface `PASS` means aggregate release evidence plus a representative route check, not a second live content review.
+
 ## 1.2.0 — 2026-11-09
 
 - Releases the learner-facing source audit as a required Creator → Reviewer acceptance gate, including exact prompt/figure inspection and explicit handling of source figure IDs, editorial descriptions, and missing assets.

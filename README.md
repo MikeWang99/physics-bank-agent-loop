@@ -1,6 +1,6 @@
 # Physics Bank Agent Loop
 
-A reusable Creator → independent Reviewer workflow for building and repairing physics question banks. The repository packages Agent Loop `1.2.0`, its Codex skill and role profiles, and the Physics Bank `3.0.0-rc.5` snapshot that the Creator must follow.
+A reusable Creator → independent Reviewer workflow for building and repairing physics question banks. The repository packages Agent Loop `1.3.0`, its Codex skill and role profiles, and the Physics Bank `3.0.0-rc.5` snapshot that the Creator must follow.
 
 ## What is included
 
@@ -33,5 +33,5 @@ The bundled skill is a versioned snapshot. When updating it, copy the complete s
 
 The original high-quality source extraction/asset review and independent Creator/Reviewer loop remain unchanged. The optional new delivery phase can generate standardized reviewed student answers, compile per question, quarantine incompatible items without blocking valid questions, and pass the ready subset to the **already existing** Pocket Cosmos production publisher API. See \`skills/physics-bank-agent-loop/references/post-acceptance-delivery.md\` and \`skills/physics-bank-agent-loop/scripts/delivery.py\`.
 
-This first-stage change is **not** a direct PDF/DOCX/image upload web endpoint or a completed online high-priority review queue. Those website-facing endpoints, plus v2/TIMBAD cloud editing, remain follow-on integration work. Publish defaults to preflight; only \`--apply\` makes production writes.
+Post-publish checks use the publisher receipt, aggregate set count, and one representative smoke check per requested surface; exhaustive live item/UID audits are targeted diagnostics. This first-stage change is **not** a direct PDF/DOCX/image upload web endpoint or a completed online high-priority review queue. Those website-facing endpoints, plus v2/TIMBAD cloud editing, remain follow-on integration work. Publish defaults to preflight; only \`--apply\` makes production writes.
 

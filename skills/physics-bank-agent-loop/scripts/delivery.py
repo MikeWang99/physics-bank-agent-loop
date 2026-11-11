@@ -190,7 +190,10 @@ def isolated_compile(bank: Path, config: dict, question: dict, position: int, as
         result = compiler.compile_bank(root, config)
         item = result["questions"][0]
         item["question"]["position"] = position
-        item["version"]["metadata"]["practiceStep"]["title"] = f"Question {position + 1}"
+        original_number = question.get("original_number")
+        if original_number is None:
+            original_number = position + 1
+        item["version"]["metadata"]["practiceStep"]["title"] = f"Question {original_number}"
         recalculate_hash(item)
         return item
 
@@ -337,7 +340,9 @@ def run(bank: Path, config_file: Path, answers_file: Path, output_dir: Path, app
             if qid not in indexed:
                 raise ValueError("missing independently verified standardized answer")
             answer = reviewed_answer(indexed[qid], question)
-            item = isolated_compile(bank, config, question, pos, assets, compiler)
+            # Published positions must be dense after source-review/answer filtering;
+            # the learner-facing title retains the printed exam question number.
+            item = isolated_compile(bank, config, question, len(ready), assets, compiler)
             version = item["version"]
             meta = version["metadata"]
             step = meta["practiceStep"]

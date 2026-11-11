@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.1 — 2026-11-11
+
+- Fixes partial-batch delivery positions so accepted questions compile to a contiguous runtime order after quarantined items are removed.
+- Keeps original exam question numbers in learner-facing titles while runtime positions are compacted.
+
 ## 1.3.0 — 2026-11-11
 
 - Replaces exhaustive post-publish per-question/per-UID checks with a publisher receipt, set-level count check, and one representative smoke check for each requested surface.

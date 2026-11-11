@@ -7,7 +7,7 @@ This phase **starts only after** the existing Coordinator/Creator/independent Re
 Input: an accepted canonical \`question-bank/\` folder, a normal \`pocket-cosmos-publish-config/v1\` config, and \`physics-bank-delivery-answers/v1\` reviewed answers. The postprocessor must **not** write \`questions.json\`, \`assets.json\` or any original asset. Output is a publisher-compatible JSON bundle plus a local audit queue.
 
 - **Ready to publish:** valid question with a source-faithful image/text presentation, allowed existing course, reviewed knowledge UID and difficulty, and independently checked standardized answer. These become live practice questions and are also normal-priority, *not-yet-human-reviewed* items.
-- **High-priority intervention:** missing/invalid UID, course mismatch, unresolved image or reading-order problem, unsupported layout, source/AI answer disagreement, incomplete answer verification, or a compile failure. Keep its original ID and error in \`delivery-review-queue.json\`. Do not invent a UID or change a source symbol. These are **not** sent to the production publisher. A future admin intake endpoint must persist them in a high-priority queue independent from the published-version review list; the local queue alone is not that feature.
+- **High-priority intervention:** missing/invalid UID, course mismatch, unresolved image or reading-order problem, unsupported layout, an answer whose independent derivation remains incorrect, unsupported, or inconclusive; incomplete answer verification, or a compile failure. Keep its original ID and error in \`delivery-review-queue.json\`. Do not invent a UID or change a source symbol. These are **not** sent to the production publisher. A disagreement with the official answer alone is not a high-priority blocker after independent verification. A future admin intake endpoint must persist genuine blockers in a high-priority queue independent from the published-version review list; the local queue alone is not that feature.
 
 A failed question must not block other valid questions in the same accepted bank. Re-running with fixed inputs is deterministic and safe. Existing website publisher API already deduplicates identical content hashes and retains immutable revisions.
 
@@ -15,7 +15,9 @@ A failed question must not block other valid questions in the same accepted bank
 
 The source PhysicsBank remains authoritative for original answer provenance. Its rule "do not synthesize an official answer" stays unchanged. **Only the post-acceptance delivery layer** may generate a student-facing explanation. It must mark its origin \`ai_generated\` or \`ai_enhanced\`, never \`official\`.
 
-Use two independent agent passes. The verifier gets the question/source images and the proposed final answer, but should solve independently before seeing the writer's derivation. It explicitly checks numerical values, units, model assumptions, MCQ option and image identity, any official key, FRQ grading clarity and LaTeX. A rejected/inconclusive answer goes to high-priority intervention; it is never auto-published. Both review identities must be nonempty and distinct, and verification must include concrete notes, not just a boolean.
+Use two independent agent passes. The Writer solves from the prompt and figures before checking the official key. The Verifier solves before reading the Writer's derivation, then checks numerical values, units, model assumptions, MCQ option/image identity, the official key, FRQ grading clarity and LaTeX. An official-key disagreement is evidence to evaluate, not an automatic rejection. If the independent result matches a listed choice, deliver that choice as AI-generated even when it differs from the key. If no listed choice matches a defensible result, preserve the original choices and deliver an ungraded answer with `correct_labels: []`, a required `ungraded_reason`, and a student-facing explanation of the result. The publisher leaves `correctAnswer` empty so submissions are recorded without scoring. Use high-priority intervention only when the independent answer remains incorrect, unsupported, or inconclusive, or an unrelated source/presentation/schema gate fails. Both review identities must be nonempty and distinct, with concrete notes.
+
+When an official-key conflict was the only reason difficulty remained `NEEDS_REVIEW`, rate TIMBAD from the independently verified solution and send that rating to the independent source Reviewer. Do not leave the rating pending just because the key differs. Keep a genuinely unresolved model, missing condition, UID, or difficulty issue as a separate blocker; Topic Practice requires a reviewed UID and approved difficulty.
 
 Answer file example:
 
@@ -32,6 +34,16 @@ Answer file example:
       "reviewer": {"id": "independent-answer-verifier", "independent": true, "verdict": "ACCEPT", "notes": "Re-solved from the original diagram; agrees with B and has consistent units."}
     },
     {
+      "id": "ap1-q003",
+      "kind": "mcq",
+      "correct_labels": [],
+      "ungraded_reason": "The derived value is 2.72 m/s; none of the printed options matches.",
+      "official_key_conflict": true,
+      "detailed_explanation": "Use the field component normal to the circuit plane; the resulting terminal speed is 2.72 m/s, so no printed choice is correct.",
+      "creator": {"id": "answer-writer"},
+      "reviewer": {"id": "independent-answer-verifier", "independent": true, "verdict": "ACCEPT", "notes": "Independently derived 2.72 m/s and confirmed no listed choice matches; preserve the official key as provenance and leave this item ungraded."}
+    },
+    {
       "id": "ap1-q002",
       "kind": "frq",
       "exam_answer": "State $\\sum F=ma$, substitute the given values, and report the result with units.",
@@ -43,7 +55,7 @@ Answer file example:
 }
 \`\`\`
 
-Use source-provided \`g\` when specified; otherwise, for user-created solutions, default to \`g=10\,\mathrm{m/s^2}\`. Do not override an official marking scheme or source-defined convention. Use \`$...$\` and \`$$...$$\` exclusively for mathematics, explicit units, short paragraphs, aligned equations where useful, and no raw HTML. MCQ outputs label plus detailed reasoning. FRQ outputs first a concise, full-credit **Exam-style answer**, then a distinct **Detailed explanation** suitable for teaching; avoid extraneous filler.
+Use source-provided \`g\` when specified; otherwise, for user-created solutions, default to \`g=10\,\mathrm{m/s^2}\`. Keep the original official key/provenance unchanged in canonical PhysicsBank. In the delivery layer, an independently verified answer may differ from that key: mark it `ai_generated`, record the official labels and conflict, and never call it official. If no listed choice matches, publish the verified result without auto-grading rather than changing the source options. Use \`$...$\` and \`$$...$$\` exclusively for mathematics, explicit units, short paragraphs, aligned equations where useful, and no raw HTML. MCQ outputs label plus detailed reasoning. FRQ outputs first a concise, full-credit **Exam-style answer**, then a distinct **Detailed explanation** suitable for teaching; avoid extraneous filler.
 
 The postprocessor overlays \`version.answer.solution\` and \`metadata.practiceStep.solution\`, records \`metadata.physicsBank.deliveryAnswer\`, and recomputes the exact publisher content hash. It does not overwrite the original \`metadata.physicsBank.answer\`. A human change via website review should continue creating a fresh version with the existing versioning model.
 

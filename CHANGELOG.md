@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.4.0 — 2026-11-11
+
+- Treats an official answer-key disagreement as an answer-layer issue, not an automatic source-review or publication blocker.
+- Requires independent solve and verification before accepting a differing AI-generated answer; preserves canonical official-answer provenance.
+- Publishes a defensibly solved multiple-choice question with no matching option as ungraded, preserving the source options and recording the result and reason.
+- Re-rates difficulty from the independently verified solution when the official-key conflict alone left it pending, with separate independent review; keeps UID and Topic Practice eligibility gates intact.
+- Updates the bundled Physics Bank snapshot to `3.0.0-rc.6`.
+
 ## 1.3.1 — 2026-11-11
 
 - Fixes partial-batch delivery positions so accepted questions compile to a contiguous runtime order after quarantined items are removed.

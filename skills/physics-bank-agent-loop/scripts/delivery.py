@@ -106,27 +106,39 @@ def reviewed_answer(source: dict, question: dict) -> dict:
     explanation = markdown_latex(source.get("detailed_explanation"), f"{qid}.detailed_explanation")
     if kind == "mcq":
         labels = source.get("correct_labels")
-        if not isinstance(labels, list) or not labels or any(not isinstance(x, str) for x in labels):
-            raise ValueError(f"{qid}: correct_labels must be a nonempty list")
+        if not isinstance(labels, list) or any(not isinstance(x, str) or not x.strip() for x in labels):
+            raise ValueError(f"{qid}: correct_labels must be a list of option labels")
         labels = [x.strip().upper() for x in labels]
         if len(set(labels)) != len(labels):
             raise ValueError(f"{qid}: duplicate answer labels")
         legal = {str(c.get("label") or "").strip().upper() for c in question["choices"]}
         if not set(labels) <= legal:
             raise ValueError(f"{qid}: answer label not among the choices")
+        ungraded_reason = str(source.get("ungraded_reason") or "").strip()
+        if not labels and not ungraded_reason:
+            raise ValueError(f"{qid}: an ungraded MCQ requires ungraded_reason")
+        if labels and ungraded_reason:
+            raise ValueError(f"{qid}: ungraded_reason is only valid when correct_labels is empty")
         source_answer = question.get("answer") or {}
-        official = [x.upper() for x in re.split(r"[,;/\s]+", str(source_answer.get("label") or "").strip()) if x]
-        if official and set(official) != set(labels):
-            raise ValueError(f"{qid}: AI answer conflicts with supplied source key")
+        source_provenance = source_answer.get("source") if isinstance(source_answer.get("source"), dict) else {}
+        official_value = source_answer.get("label") or source_provenance.get("official_label") or ""
+        official = [x.upper() for x in re.split(r"[,;/\s]+", str(official_value).strip()) if x]
+        official_conflict = bool(source.get("official_key_conflict") is True or (official and set(official) != set(labels)))
+        grading_mode = "graded" if labels else "ungraded"
+        answer_heading = "**Correct answer: " + ", ".join(labels) + "**" if labels else "**No listed choice matches the independently derived result**"
         return {
             "kind": kind,
-            "label": ",".join(labels),
-            "text": "**Correct answer: " + ", ".join(labels) + "**\n\n**Detailed explanation**\n\n" + explanation,
+            "label": ",".join(labels) or None,
+            "text": answer_heading + "\n\n**Detailed explanation**\n\n" + explanation,
             "examAnswer": None,
             "creatorId": creator_id,
             "reviewerId": reviewer_id,
             "reviewNotes": reviewer["notes"].strip(),
-            "origin": "ai_generated" if not (source_answer.get("text") or official) else "ai_enhanced",
+            "origin": "ai_generated" if official_conflict or not (source_answer.get("text") or official) else "ai_enhanced",
+            "officialLabels": official,
+            "officialKeyConflict": official_conflict,
+            "gradingMode": grading_mode,
+            "ungradedReason": ungraded_reason or None,
         }
     exam = markdown_latex(source.get("exam_answer"), f"{qid}.exam_answer")
     return {
@@ -355,6 +367,14 @@ def run(bank: Path, config_file: Path, answers_file: Path, output_dir: Path, app
                 preserved["correctAnswer"] = answer["label"]
                 step["correctAnswer"] = answer["label"]
                 step["maxScore"] = 1
+                step["answerNudge"] = ""
+            else:
+                # Preserve an ungraded MCQ as practice without allowing the
+                # original, conflicting key to remain in the compiled step.
+                preserved["correctAnswer"] = None
+                step.pop("correctAnswer", None)
+                step["maxScore"] = 0
+                step["answerNudge"] = "此题没有与独立解答匹配的选项，提交仅记录作答。"
             if answer["examAnswer"]:
                 preserved["sampleAnswer"] = answer["examAnswer"]
                 step["sampleAnswer"] = answer["examAnswer"]
@@ -368,6 +388,10 @@ def run(bank: Path, config_file: Path, answers_file: Path, output_dir: Path, app
                 "reviewNotes": answer["reviewNotes"],
                 "format": "markdown+latex",
                 "kind": answer["kind"],
+                "gradingMode": answer.get("gradingMode", "graded"),
+                "ungradedReason": answer.get("ungradedReason"),
+                "sourceOfficialLabels": answer.get("officialLabels", []),
+                "officialKeyConflict": answer.get("officialKeyConflict", False),
             }
             recalculate_hash(item)
             ready.append(item)

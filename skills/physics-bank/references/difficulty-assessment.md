@@ -46,7 +46,7 @@ Recommended: `review_notes`, `assessed_at` (ISO 8601/null), `reviewer` (known id
 
 `difficulty.final_answer` and `difficulty.solution_outline` are **assessment metadata** from the independent check. They never become `question.answer.text`, `answer.label`, `answer.layout_blocks`, or official answer evidence. `derive_semantic_tags.py` must not copy them there. Downstream consumers must keep the rating audit separate from the student-facing official solution.
 
-When no official answer is supplied, Stage B still leaves `question.answer.evidence: "not-provided"`. The model may solve for rating, storing only the audit result here. A supplied key disagreement requires `REVISE`/`NEEDS_REVIEW` and review notes; preserve the source key. If no reliable solution can be established, use NEEDS_REVIEW/null, not an assumed high difficulty.
+When no official answer is supplied, Stage B still leaves `question.answer.evidence: "not-provided"`. The model may solve for rating, storing only the audit result here. Preserve any supplied official key and record a disagreement as provenance. A key disagreement alone does not require `REVISE`/`NEEDS_REVIEW` when the source prompt has a reliable independently verified solution; rate difficulty from that solution and obtain a separate independent review. Use NEEDS_REVIEW/null when an unresolved physical interpretation, missing condition, or other material uncertainty prevents reliable solution or rating.
 
 ## State and publication gates
 

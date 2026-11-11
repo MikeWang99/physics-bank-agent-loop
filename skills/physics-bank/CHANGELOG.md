@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.0.0-rc.6 — 2026-11-11 (answer-key conflict and difficulty separation)
+
+- Preserves official answer-key provenance while allowing difficulty to be rated from an independently verified solution when the key alone conflicts.
+- Keeps genuinely unresolved physical interpretations and missing conditions in `NEEDS_REVIEW`; does not weaken UID, difficulty-evidence, or source-fidelity gates.
+
 ## 3.0.0-rc.5 — 2026-11-09 (learner-facing fidelity gate)
 
 - Carries the source-figure, missing-image, and unsupported-assumption fidelity gate into the standalone Physics Bank source skill and strict validator.
